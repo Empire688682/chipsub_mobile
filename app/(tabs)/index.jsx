@@ -2,7 +2,8 @@ import { View, Text, ScrollView } from "react-native"
 
 const Index = () => {
   return (
-    <ScrollView
+    <View>
+      <ScrollView
       showsVerticalScrollIndicator={false}
     >
       {
@@ -13,6 +14,7 @@ const Index = () => {
         ))
       }
     </ScrollView>
+    </View>
   )
 }
 

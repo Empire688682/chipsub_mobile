@@ -1,15 +1,15 @@
 import { Stack, useRouter } from "expo-router";
 import { useEffect } from "react";
-import { AppProvider } from "../lib/GlobalContext";
+import { AppProvider, useGlobalContext } from "../lib/GlobalContext";
 
 
 const LayoutGuide = ({ children }) => {
-  const isAuthenticated = true;
+  const {isAuthenticated} = useGlobalContext();
   const router = useRouter();
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!isAuthenticated) {
-        router.push("");
+        router.push("/auth");
       }
     }, 0);
     return () => clearTimeout(timer)

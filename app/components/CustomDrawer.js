@@ -11,13 +11,13 @@ export default function CustomDrawer() {
 
     const menuItems = [
         { name: "Home", path: "/" },
-        { name: "About", path: "/about" },
-        { name: "Api Docs", path: "/api_docs" },
-        { name: "Blog", path: "/blog" },
-        { name: "Contact", path: "/contact" },
-        { name: "Dashboard", path: "/dashboard" },
-        { name: "Fund Wallet", path: "/fund_wallet" },
         { name: "Profile", path: "/profile" },
+        { name: "Dashboard", path: "/dashboard" },
+        { name: "Api Docs", path: "/api_docs" },
+        { name: "Fund Wallet", path: "/fund_wallet" },
+        { name: "Contact", path: "/contact" },
+        { name: "About", path: "/about" },
+        { name: "Blog", path: "/blog" },
     ];
 
     return (

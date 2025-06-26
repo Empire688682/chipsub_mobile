@@ -8,6 +8,7 @@ export function AppProvider({ children }) {
   const toggleDrawer = () => setIsDrawerOpen(prev => !prev);
   const router = useRouter();
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   return (
     <AppContext.Provider value={{
@@ -15,7 +16,9 @@ export function AppProvider({ children }) {
       toggleDrawer,
       setIsDrawerOpen,
       router,
-      apiUrl
+      apiUrl,
+      isAuthenticated,
+      setIsAuthenticated
     }}>
       {children}
     </AppContext.Provider>

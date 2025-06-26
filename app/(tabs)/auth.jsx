@@ -27,7 +27,7 @@ const initialData = {
 
 export default function AuthScreen() {
   // authType could come from route params; mocked here
-  const {apiUrl} = useGlobalContext();
+  const {apiUrl, setIsAuthenticated, router} = useGlobalContext();
   const [authType, setAuthType] = useState("login");
   const [data, setData] = useState(initialData);
   const [refHostId] = useState("");      // mocked; replace as needed
@@ -59,6 +59,8 @@ export default function AuthScreen() {
       }
 
       Toast.show({ type: "success", text1: "Success!" });
+      setIsAuthenticated(true);
+      router.push("/dashboard");
       setData(initialData);
     } catch (err) {
       setError(err?.response?.data?.message || "Something went wrong");
