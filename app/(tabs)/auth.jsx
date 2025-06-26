@@ -31,7 +31,7 @@ export default function AuthScreen() {
   const {apiUrl, setIsAuthenticated, router, setUserData} = useGlobalContext();
   const [authType, setAuthType] = useState("login");
   const [data, setData] = useState(initialData);
-  const [refHostId] = useState("");      // mocked; replace as needed
+  const [refHostId] = useState("okay");      // mocked; replace as needed
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -59,11 +59,9 @@ export default function AuthScreen() {
         return;
       }
 
-     setUserData(finalUserData);
-
-      Toast.show({ type: "success", text1: "Success!" });
+      Toast.show({ type: "success", text1: ["Success!", JSON.parse(res.data)]});
       setIsAuthenticated(true);
-      router.push("/dashboard");
+      //router.push("/dashboard");
       setData(initialData);
     } catch (err) {
       setError(err?.response?.data?.message || "Something went wrong");
