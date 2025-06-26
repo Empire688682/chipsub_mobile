@@ -12,6 +12,7 @@ import {
   Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useGlobalContext } from '../../lib/GlobalContext';
 
 // Mock data to replace useGlobalContext
 const mockUserData = {
@@ -60,11 +61,11 @@ const mockTransactionHistory = [
 ];
 
 const ProfileScreen = () => {
+  const {userData} = useGlobalContext()
   const [notify, setNotify] = useState(true);
   const [loading, setLoading] = useState(true);
   const [postLoading, setPostLoading] = useState(false);
   const [transactionHistory, setTransactionHistory] = useState([]);
-  const [userData] = useState(mockUserData);
 
   const [pwdForm, setPwdForm] = useState({
     currentPwd: '',

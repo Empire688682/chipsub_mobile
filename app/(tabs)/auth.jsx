@@ -13,6 +13,7 @@ import Toast from "react-native-toast-message";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useGlobalContext } from "../../lib/GlobalContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // ───────────────────────────────────────────────────────────
 // MOCKED INITIAL STATE ─ replace later with context or redux
@@ -27,7 +28,7 @@ const initialData = {
 
 export default function AuthScreen() {
   // authType could come from route params; mocked here
-  const {apiUrl, setIsAuthenticated, router} = useGlobalContext();
+  const {apiUrl, setIsAuthenticated, router, setUserData} = useGlobalContext();
   const [authType, setAuthType] = useState("login");
   const [data, setData] = useState(initialData);
   const [refHostId] = useState("");      // mocked; replace as needed
@@ -51,12 +52,14 @@ export default function AuthScreen() {
     setLoading(true);
     try {
       const res = await axios.post(baseUrl, { ...data, refId: refHostId });
-      const { success, message } = res.data;
+      const { success, message, finalUserData } = res.data;
 
       if (!success) {
         setError(message || "Authentication failed");
         return;
       }
+
+     setUserData(finalUserData);
 
       Toast.show({ type: "success", text1: "Success!" });
       setIsAuthenticated(true);
