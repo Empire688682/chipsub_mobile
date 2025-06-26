@@ -30,7 +30,7 @@ export default function RootLayout() {
         </Pressable>
 
         {/* make icon tappable */}
-        <Pressable onPress={toggleDrawer}>
+        <Pressable onPress={toggleDrawer} style={{paddingRight:20}}>
           <MaterialIcons name="menu" size={30} color="#fff" />
         </Pressable>
       </LinearGradient>
@@ -47,16 +47,17 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    paddingTop: 70,
-    paddingLeft: 10
+    paddingTop: 95,
+    paddingHorizontal:20
   },
   menuBar: {
     ...StyleSheet.absoluteFillObject,
-    height: 50,
+    height: 90,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingRight: 5,
+    paddingTop: 30,
     zIndex: 10,
   },
   logo: {

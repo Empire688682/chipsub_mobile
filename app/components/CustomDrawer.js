@@ -66,17 +66,17 @@ const { height: screenHeight } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
     container: {
-        top: 0,
+        top: 35,
         width: "100%",
         position: "absolute",
         zIndex: 11,
         flexDirection: "row",
         right: 0,
-        left: 0
+        left: 0,
     },
     menuContainer: {
         paddingTop: 60,
-        width: "50%",
+        width: "65%",
         backgroundColor: "#fff",
         height: screenHeight,
         paddingHorizontal: 10,
@@ -128,7 +128,8 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         color: "gray",
         flexDirection: "row",
-        padding: 8
+        padding: 8,
+        alignItems:"center"
     },
     logoutBtnIcon: {
         fontWeight: "700",

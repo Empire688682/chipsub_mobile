@@ -22,7 +22,6 @@ export default function RootLayout() {
     <LayoutGuide>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false, headerBackTitle: null }} />
-        <Stack.Screen name="auth" options={{ title: "Auth" }} />
       </Stack>
     </LayoutGuide>;
   </AppProvider>
