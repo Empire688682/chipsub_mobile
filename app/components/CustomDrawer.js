@@ -1,11 +1,13 @@
 
-import { View, TouchableOpacity, Text, StyleSheet, Dimensions } from "react-native";
-import { useRouter, usePathname } from "expo-router";
+import { View, TouchableOpacity, Text, StyleSheet, Dimensions, Image } from "react-native";
+import { usePathname } from "expo-router";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useGlobalContext } from "../../lib/GlobalContext";
+import { Pressable } from "react-native";
 
 export default function CustomDrawer() {
-    const router = useRouter();
     const pathname = usePathname();
+    const { toggleDrawer, router, setIsDrawerOpen } = useGlobalContext();
 
     const menuItems = [
         { name: "Home", path: "/" },
@@ -21,12 +23,19 @@ export default function CustomDrawer() {
     return (
         <View style={styles.container}>
             <View style={styles.menuContainer}>
+                <Pressable onPress={() => { router.push("/"); setIsDrawerOpen(false) }}>
+                    <Image
+                        source={require("../../assets/images/chipsub.png")}
+                        style={styles.logo}
+                        resizeMode="contain"
+                    />
+                </Pressable>
                 {menuItems.map((item) => {
                     const isActive = pathname === item.path;
                     return (
                         <TouchableOpacity
                             key={item.path}
-                            onPress={() => router.push(item.path)}
+                            onPress={() => { router.push(item.path); toggleDrawer() }}
                             style={[styles.linkBase, isActive ? styles.activeLink : styles.link]}
                         >
                             <Text style={isActive ? styles.activeText : styles.text}>
@@ -44,9 +53,10 @@ export default function CustomDrawer() {
                     </Text>
                 </TouchableOpacity>
             </View>
-            <View style={styles.emptyContainer}>
-                <Text>Hello</Text>
-            </View>
+            <Pressable
+                onPress={() => setIsDrawerOpen(false)}
+                style={styles.emptyContainer}
+            />
         </View>
     );
 }
@@ -56,23 +66,32 @@ const { height: screenHeight } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
     container: {
+        top: 0,
         width: "100%",
         position: "absolute",
-        zIndex: 10,
-        flexDirection:"row",
-        right:0,
-        left:0
+        zIndex: 11,
+        flexDirection: "row",
+        right: 0,
+        left: 0
     },
-    menuContainer:{
+    menuContainer: {
+        paddingTop: 60,
         width: "50%",
         backgroundColor: "#fff",
-        height: screenHeight, 
-        paddingHorizontal:10
+        height: screenHeight,
+        paddingHorizontal: 10,
     },
-    emptyContainer:{
+    emptyContainer: {
         width: "50%",
         backgroundColor: "rgba(0, 0, 0, 0.1)",
-        height: screenHeight, 
+        height: screenHeight,
+    },
+    logo: {
+        width: 120,
+        height: 110,
+        position: "absolute",
+        top: -90,
+        left: -15
     },
     menuBar: {
         cursor: "pointer",
