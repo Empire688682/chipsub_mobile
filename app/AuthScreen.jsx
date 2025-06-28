@@ -12,8 +12,8 @@ import axios from "axios";
 import Toast from "react-native-toast-message";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useGlobalContext } from "../../lib/GlobalContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useGlobalContext } from "../lib/GlobalContext";
 
 // ───────────────────────────────────────────────────────────
 // MOCKED INITIAL STATE ─ replace later with context or redux
@@ -52,19 +52,21 @@ export default function AuthScreen() {
     setLoading(true);
     try {
       const res = await axios.post(baseUrl, { ...data, refId: refHostId });
-      const { success, message, finalUserData } = res.data;
+      const { status, message, finalUserData } = res.data;
 
-      if (!success) {
+      console.log("res:", res);
+
+      if (status !== 200 || !res.data?.finalUserData) {
         setError(message || "Authentication failed");
         return;
       }
 
-      Toast.show({ type: "success", text1: ["Success!", JSON.parse(res.data)]});
+      Toast.show({ type: "success", text1:"Success!", text2:message, text1Style:{fontWeight:"bold", color:"green"}});
       setIsAuthenticated(true);
       //router.push("/dashboard");
       setData(initialData);
     } catch (err) {
-      setError(err?.response?.data?.message || "Something went wrong");
+      setError(err?.response?.data?.message || err?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
