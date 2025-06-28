@@ -10,9 +10,8 @@ import {
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Toast from "react-native-toast-message";
-import { AntDesign } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useGlobalContext } from "../lib/GlobalContext";
 
 // ───────────────────────────────────────────────────────────
@@ -28,7 +27,7 @@ const initialData = {
 
 export default function AuthScreen() {
   // authType could come from route params; mocked here
-  const {apiUrl, setIsAuthenticated, router, setUserData} = useGlobalContext();
+  const {apiUrl, getLocalStorageUser, isAuthenticated, setAuthChecked} = useGlobalContext();
   const [authType, setAuthType] = useState("login");
   const [data, setData] = useState(initialData);
   const [refHostId] = useState("okay");      // mocked; replace as needed
@@ -45,6 +44,8 @@ export default function AuthScreen() {
       ? `${apiUrl}api/auth/register`
       : "";
 
+      console.log("isAuthenticated:", isAuthenticated);
+
   // ────────── CORE AUTH HANDLER ──────────
   const userAuthHandler = async () => {
     if (authType === "reset password") return handlePasswordReset();
@@ -52,27 +53,43 @@ export default function AuthScreen() {
     setLoading(true);
     try {
       const res = await axios.post(baseUrl, { ...data, refId: refHostId });
-      const { status, message, finalUserData } = res.data;
+      const { success, message, token, finalUserData } = res.data;
+      console.log("res.data:", res.data)
 
-      console.log("res:", res);
-
-      if (status !== 200 || !res.data?.finalUserData) {
+      if (!success || !res.data?.finalUserData) {
         setError(message || "Authentication failed");
         return;
-      }
+      };
 
       Toast.show({ type: "success", text1:"Success!", text2:message, text1Style:{fontWeight:"bold", color:"green"}});
-      setIsAuthenticated(true);
-      //router.push("/dashboard");
+      // Store user data with token
+      const userDataToStore = { ...finalUserData, token };
+      await AsyncStorage.setItem("userData", JSON.stringify(userDataToStore));
+      console.log("User data stored:", userDataToStore);
+      
       setData(initialData);
-    } catch (err) {
-      setError(err?.response?.data?.message || err?.message || "Something went wrong");
+      await getLocalStorageUser();
+    } catch (error) {
+        console.log("error:", error)
+        setError(error?.response?.data.message || error.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFormSubmission = () => userAuthHandler();
+ const handleFormSubmission = () => {
+    if (!data.email || !data.password) {
+      setError("Please fill in all required fields");
+      return;
+    }
+    
+    if (authType === "register" && (!data.name || !data.number)) {
+      setError("Please fill in all required fields");
+      return;
+    }
+    
+    userAuthHandler();
+  };
 
   const handlePasswordReset = async () => {
     try {
@@ -92,6 +109,7 @@ export default function AuthScreen() {
   // show toast for explicit `error`
   useEffect(() => {
     if (error) {
+        console.log("error:", error)
       Toast.show({ type: "error", text1: error });
       const t = setTimeout(() => setError(""), 3000);
       return () => clearTimeout(t);

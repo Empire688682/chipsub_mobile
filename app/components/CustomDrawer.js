@@ -1,16 +1,15 @@
 
-import { View, TouchableOpacity, Text, StyleSheet, Dimensions, Image } from "react-native";
+import { View, TouchableOpacity, Text, StyleSheet, Dimensions, Image, Pressable } from "react-native";
 import { usePathname } from "expo-router";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useGlobalContext } from "../../lib/GlobalContext";
-import { Pressable } from "react-native";
 
 export default function CustomDrawer() {
     const pathname = usePathname();
-    const { toggleDrawer, router, setIsDrawerOpen } = useGlobalContext();
+    const { toggleDrawer, router, setIsDrawerOpen, logout } = useGlobalContext();
 
     const menuItems = [
-        { name: "Home", path: "/" },
+        { name: "Home", path: "/dashboard" },
         { name: "Profile", path: "/profile" },
         { name: "Dashboard", path: "/dashboard" },
         { name: "Api Docs", path: "/api_docs" },
@@ -46,6 +45,7 @@ export default function CustomDrawer() {
                 })}
                 <TouchableOpacity
                     style={[styles.logoutBtn]}
+                    onPress={logout}
                 >
                     <MaterialIcons style={styles.logoutBtnIcon} name="logout" size={24} color="black" />
                     <Text style={styles.logoutBtnText}>
