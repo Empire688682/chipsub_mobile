@@ -11,7 +11,7 @@ import {
   Alert,
   FlatList,
 } from "react-native";
-import { Feather, MaterialIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard"; 
 
 /* ─── MOCK DATA ──────────────────────────────────────────── */

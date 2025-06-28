@@ -9,7 +9,7 @@ export default function CustomDrawer() {
     const { toggleDrawer, router, setIsDrawerOpen, logout } = useGlobalContext();
 
     const menuItems = [
-        { name: "Home", path: "/dashboard" },
+        { name: "Home", path: "/" },
         { name: "Profile", path: "/profile" },
         { name: "Dashboard", path: "/dashboard" },
         { name: "Api Docs", path: "/api_docs" },
@@ -22,7 +22,7 @@ export default function CustomDrawer() {
     return (
         <View style={styles.container}>
             <View style={styles.menuContainer}>
-                <Pressable onPress={() => { router.push("/"); setIsDrawerOpen(false) }}>
+                <Pressable onPress={() => { router.push("/index"); setIsDrawerOpen(false) }}>
                     <Image
                         source={require("../../assets/images/chipsub.png")}
                         style={styles.logo}
