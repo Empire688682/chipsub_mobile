@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import { AppProvider, useGlobalContext } from "../lib/GlobalContext";
 
 const InnerLayout = () => {
+  const {isAuthenticated} = useGlobalContext()
   return <Stack>
     <Stack.Screen name="(tabs)" options={{ headerShown: false, headerBackTitle: null }} />
   </Stack>
