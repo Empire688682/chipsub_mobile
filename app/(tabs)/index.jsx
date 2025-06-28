@@ -433,69 +433,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  // Actions section
-  actionsContainer: {
-    paddingHorizontal: 20,
-    marginTop: 40,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#1f2937",
-    marginBottom: 20,
-  },
-  actionsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  actionCard: {
-    width: (width - 60) / 2,
-    marginBottom: 16,
-  },
-  actionPressable: {
-    borderRadius: 20,
-    overflow: "hidden",
-  },
-  actionGradient: {
-    padding: 20,
-    borderRadius: 20,
-    alignItems: "center",
-    minHeight: 140,
-    justifyContent: "center",
-    position: "relative",
-    overflow: "hidden",
-  },
-  actionIconContainer: {
-    backgroundColor: "rgba(255,255,255,0.2)",
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  actionTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-    marginBottom: 4,
-  },
-  actionSubtitle: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.8)",
-  },
-  shimmer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    width: 100,
-    transform: [{ skewX: "-20deg" }],
-  },
-
   // CTA section
   ctaContainer: {
     paddingHorizontal: 20,
