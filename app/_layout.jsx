@@ -12,8 +12,6 @@ function AuthLayoutHandler() {
       return;
     }
 
-    console.log("Auth check complete:", { isAuthenticated, pathname });
-
     // Redirect to AuthScreen if not authenticated and not already there
     if (!isAuthenticated && pathname !== "/AuthScreen") {
       console.log("Redirecting to AuthScreen - not authenticated");

@@ -15,14 +15,13 @@ import { Feather } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard"; 
 import Wallet from "../components/Wallet";
 import { useGlobalContext } from "../../lib/GlobalContext";
+import DashboardAnimation from "../components/DashboardAnimation";
 
 export default function DashboardScreen({ navigation }) {
   /* STATE */
   const {userTransactionData, userData} = useGlobalContext();
   const [withdrawLoading, setWithdrawLoading] = useState(false);
   const [index, setIndex] = useState(5);
-
-  console.log("userTransactionData:", userTransactionData);
 
   const firstName = userData.name.split(" ")[0];
   const referralLink = `https://chipsub.vercel.app?ref=${userData.userId}`;
@@ -37,6 +36,7 @@ export default function DashboardScreen({ navigation }) {
   return (
     <ScrollView style={styles.screen} showsVerticalScrollIndicator={false}  contentContainerStyle={{ paddingBottom: 40 }}>
       {/* Greeting + notification */}
+      <DashboardAnimation />
       <View style={styles.rowBetween}>
         <Text style={styles.greet}>
           <Feather name="heart" size={16} color="#2563eb" /> Welcome back,&nbsp;

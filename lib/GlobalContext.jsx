@@ -55,7 +55,6 @@ const getLocalStorageUser = async () => {
   const mobileUserId = userData.userId;
   try {
     const response = await axios.get(apiUrl + "api/real-time-data", {params:{mobileUserId:mobileUserId}});
-    console.log("response:", response);
     setUserTransactionData(response.data.data)
   } catch (error) {
     console.log("FetchUserTransc:", error)

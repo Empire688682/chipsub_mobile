@@ -12,17 +12,15 @@ import { useGlobalContext } from '../../lib/GlobalContext';
 
 const { width } = Dimensions.get('window');
 
-const Page = () => {
+const DashboardAnimation = () => {
   const {  apiUrl, userData } = useGlobalContext();
   const [allData, setAllData] = useState({});
-//   const [loading, setLoading] = useState(true);
- // const [refreshing, setRefreshing] = useState(false);
-  //const scrollX = new Animated.Value(0);
+const scrollX = new Animated.Value(0);
 
   const fetchAllData = async () => {
     try {
         const mobileUserId = userData.userId
-      const response = await axios.get(`${apiUrl}/api/all-data`, {params:{mobileUserId:mobileUserId}} );
+      const response = await axios.get(`${apiUrl}api/all-data`, {params:{mobileUserId:mobileUserId}} );
       console.log("response:", response);
       if (response.data.success) {
         setAllData(response.data.data);
@@ -44,6 +42,10 @@ const Page = () => {
     }, 180000);
 
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    fetchAllData();
   }, []);
 
   // Animate the scrolling text
@@ -74,7 +76,7 @@ const Page = () => {
                 style={[
                   styles.scrollingTextContainer,
                   {
-                    transform: [{ translateX: scrollX }],
+                    transform: [{ translateX: scrollX}],
                   },
                 ]}
               >
@@ -131,4 +133,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Page;
+export default DashboardAnimation;
