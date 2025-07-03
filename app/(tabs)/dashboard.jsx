@@ -13,59 +13,24 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard"; 
-
-/* ─── MOCK DATA ──────────────────────────────────────────── */
-const mockUser = { _id: "abc123", name: "John Doe" };
-const mockWalletBalance = 6500;
-const mockCommission = 1250.0;
-
-const mockTransactions = [
-  {
-    _id: "tr1",
-    createdAt: "2025-06-22T12:30:00Z",
-    description: "MTN 1 GB Data",
-    amount: 300,
-    type: "debit",
-    status: "success",
-  },
-  {
-    _id: "tr2",
-    createdAt: "2025-06-21T09:15:00Z",
-    description: "Wallet Funding",
-    amount: 5000,
-    type: "credit",
-    status: "success",
-  },
-  // add more if you like
-];
-/* ────────────────────────────────────────────────────────── */
+import Wallet from "../components/Wallet";
+import { useGlobalContext } from "../../lib/GlobalContext";
 
 export default function DashboardScreen({ navigation }) {
   /* STATE */
-  const [wallet, setWallet] = useState(mockWalletBalance);
-  const [commission, setCommission] = useState(mockCommission);
+  const {userTransactionData, userData} = useGlobalContext();
   const [withdrawLoading, setWithdrawLoading] = useState(false);
   const [index, setIndex] = useState(5);
 
-  const firstName = mockUser.name.split(" ")[0];
-  const referralLink = `https://chipsub.vercel.app?ref=${mockUser._id}`;
+  console.log("userTransactionData:", userTransactionData);
+
+  const firstName = userData.name.split(" ")[0];
+  const referralLink = `https://chipsub.vercel.app?ref=${userData.userId}`;
 
   /* ACTIONS */
   const handleCopy = async () => {
     await Clipboard.setStringAsync(referralLink);
     Alert.alert("Copied!", "Referral link copied to clipboard ✅");
-  };
-
-  const withdrawCommission = () => {
-    if (commission <= 0) return Alert.alert("No commission to withdraw");
-    setWithdrawLoading(true);
-
-    setTimeout(() => {
-      setWallet((w) => w + commission);
-      setCommission(0);
-      setWithdrawLoading(false);
-      Alert.alert("Success", "Commission moved to wallet 🎉");
-    }, 1200);
   };
 
   /* RENDER */
@@ -87,20 +52,16 @@ export default function DashboardScreen({ navigation }) {
 
       {/* Wallet & Commission */}
       <View style={styles.cardRow}>
-        <View style={styles.bigCard}>
-          <Text style={styles.label}>Wallet Balance</Text>
-          <Text style={styles.bigMoney}>₦{wallet.toFixed(2)}</Text>
-        </View>
-
+        <Wallet />
         <View style={styles.bigCard}>
           <Text style={styles.label}>Commission</Text>
           <View style={styles.rowBetween}>
             {withdrawLoading ? (
               <ActivityIndicator size="small" />
             ) : (
-              <Text style={styles.bigMoney}>₦{commission.toFixed(2)}</Text>
+              <Text style={styles.bigMoney}>₦{userTransactionData?.commisionBalance?.toFixed(2)}</Text>
             )}
-            <TouchableOpacity style={styles.withdrawBtn} onPress={withdrawCommission}>
+            <TouchableOpacity style={styles.withdrawBtn}>
               <Feather name="corner-right-up" size={18} color="#fff" />
               <Text style={styles.withdrawText}>Withdraw</Text>
             </TouchableOpacity>
@@ -141,7 +102,7 @@ export default function DashboardScreen({ navigation }) {
       <Text style={styles.sectionTitle}>Transaction History</Text>
       <View style={styles.card}>
         <FlatList
-          data={[...mockTransactions].reverse().slice(0, index)}
+          data={userTransactionData?.transactions?.reverse().slice(0, index)}
           keyExtractor={(t) => t._id}
           ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
           renderItem={({ item }) => (
@@ -169,7 +130,7 @@ export default function DashboardScreen({ navigation }) {
             </Text>
           )}
         />
-        {mockTransactions.length > 5 && (
+        {userTransactionData?.transactions?.length > 5 && (
           <TouchableOpacity style={{ alignSelf: "center", marginTop: 12 }} onPress={() => setIndex(index + 3)}>
             <Text style={{ color: "#2563eb", fontWeight: "600" }}>See More →</Text>
           </TouchableOpacity>

@@ -1,6 +1,7 @@
 import { usePathname, useRouter } from "expo-router";
-import React, { createContext, useContext, useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const AppContext = createContext();
 
@@ -11,8 +12,9 @@ export function AppProvider({ children }) {
   const pathname = usePathname();
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userData, setUserData] = useState({})
+  const [userData, setUserData] = useState({});
   const [authChecked, setAuthChecked] = useState(false);
+  const [userTransactionData, setUserTransactionData] = useState({});
 
 const getLocalStorageUser = async () => {
     try {
@@ -21,7 +23,6 @@ const getLocalStorageUser = async () => {
       
       if (stored) {
         const parsed = JSON.parse(stored);
-        console.log("Found stored user:", parsed);
         setUserData(parsed);
         setIsAuthenticated(!!parsed?.token);
       } else {
@@ -49,6 +50,23 @@ const getLocalStorageUser = async () => {
     }
   };
 
+ const fetchUserTransactionData = useCallback(async () => {
+  if(!isAuthenticated) return;
+  const mobileUserId = userData.userId;
+  try {
+    const response = await axios.get(apiUrl + "api/real-time-data", {params:{mobileUserId:mobileUserId}});
+    console.log("response:", response);
+    setUserTransactionData(response.data.data)
+  } catch (error) {
+    console.log("FetchUserTransc:", error)
+  }
+}, [isAuthenticated, userData.userId, apiUrl]);
+
+
+useEffect(() => {
+  fetchUserTransactionData();
+}, [fetchUserTransactionData]);
+
   useEffect(() => {
     getLocalStorageUser();
   }, []);
@@ -68,7 +86,9 @@ const getLocalStorageUser = async () => {
       authChecked,
       getLocalStorageUser,
       setAuthChecked,
-      logout
+      logout,
+      fetchUserTransactionData,
+      userTransactionData
     }}>
       {children}
     </AppContext.Provider>
