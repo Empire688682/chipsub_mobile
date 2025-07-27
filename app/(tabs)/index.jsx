@@ -19,12 +19,15 @@ import {
   Feather,
   MaterialCommunityIcons
 } from "@expo/vector-icons";
+import { useGlobalContext } from "../../lib/GlobalContext";
 
 const { width, height } = Dimensions.get("window");
 
 export default function Index() {
+  const {allData} = useGlobalContext()
   const router = useRouter();
   const [currentTime, setCurrentTime] = useState(new Date());
+  console.log("allData", allData);
 
   // Animation refs
   const fadeIn = useRef(new Animated.Value(0)).current;
@@ -123,7 +126,7 @@ export default function Index() {
 
 
   const stats = [
-    { label: "Active Services", value: "12", icon: "trending-up" },
+    { label: "Active Services", value: allData?.users, icon: "trending-up" },
     { label: "This Month", value: "₦45,230", icon: "credit-card" },
     { label: "Saved", value: "₦8,940", icon: "savings" },
   ];

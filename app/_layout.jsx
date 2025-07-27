@@ -1,4 +1,4 @@
-import { Slot,} from "expo-router";
+import { Slot} from "expo-router";
 import { AppProvider, useGlobalContext } from "../lib/GlobalContext";
 import { View, ActivityIndicator, Text } from "react-native";
 import { useEffect } from "react";

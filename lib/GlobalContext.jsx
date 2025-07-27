@@ -15,12 +15,13 @@ export function AppProvider({ children }) {
   const [userData, setUserData] = useState({});
   const [authChecked, setAuthChecked] = useState(false);
   const [userTransactionData, setUserTransactionData] = useState({});
+  const [allData, setAllData] = useState({});
 
-const getLocalStorageUser = async () => {
+  const getLocalStorageUser = async () => {
     try {
       console.log("Checking stored user data...");
       const stored = await AsyncStorage.getItem("userData");
-      
+
       if (stored) {
         const parsed = JSON.parse(stored);
         setUserData(parsed);
@@ -50,21 +51,54 @@ const getLocalStorageUser = async () => {
     }
   };
 
- const fetchUserTransactionData = useCallback(async () => {
-  if(!isAuthenticated) return;
-  const mobileUserId = userData.userId;
-  try {
-    const response = await axios.get(apiUrl + "api/real-time-data", {params:{mobileUserId:mobileUserId}});
-    setUserTransactionData(response.data.data)
-  } catch (error) {
-    console.log("FetchUserTransc:", error)
-  }
-}, [isAuthenticated, userData.userId, apiUrl]);
+  const fetchUserTransactionData = useCallback(async () => {
+    if (!isAuthenticated) return;
+    const mobileUserId = userData.userId;
+    try {
+      const response = await axios.get(apiUrl + "api/real-time-data", { params: { mobileUserId: mobileUserId } });
+      setUserTransactionData(response.data.data)
+    } catch (error) {
+      console.log("FetchUserTransc:", error)
+    }
+  }, [isAuthenticated, userData.userId, apiUrl]);
+
+  const fetchAllData = async () => {
+    if (!isAuthenticated) return;
+    const mobileUserId = userData.userId;
+    try {
+      const response = await axios.get(`${apiUrl}api/all-data`, { params: { mobileUserId: mobileUserId } });
+      console.log("response:", response);
+      if (response.data.success) {
+        setAllData(response.data.data);
+      }
+    } catch (error) {
+      console.log("Error:", error);
+    }
+  };
+
+    // const onRefresh = async () => {
+    //   setRefreshing(true);
+    //   await fetchAllData();
+    //   setRefreshing(false);
+    // };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchAllData();
+    }, 180000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    fetchAllData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
 
 
-useEffect(() => {
-  fetchUserTransactionData();
-}, [fetchUserTransactionData]);
+  useEffect(() => {
+    fetchUserTransactionData();
+  }, [fetchUserTransactionData]);
 
   useEffect(() => {
     getLocalStorageUser();
@@ -87,7 +121,8 @@ useEffect(() => {
       setAuthChecked,
       logout,
       fetchUserTransactionData,
-      userTransactionData
+      userTransactionData,
+      allData
     }}>
       {children}
     </AppContext.Provider>

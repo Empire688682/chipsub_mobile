@@ -27,12 +27,13 @@ const initialData = {
 
 export default function AuthScreen() {
   // authType could come from route params; mocked here
-  const {apiUrl, getLocalStorageUser, isAuthenticated, setAuthChecked} = useGlobalContext();
+  const { apiUrl, getLocalStorageUser, isAuthenticated, setAuthChecked } = useGlobalContext();
   const [authType, setAuthType] = useState("login");
   const [data, setData] = useState(initialData);
   const [refHostId] = useState("okay");      // mocked; replace as needed
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleOnChange = (name, value) =>
     setData((prev) => ({ ...prev, [name]: value }));
@@ -41,10 +42,10 @@ export default function AuthScreen() {
     authType === "login"
       ? `${apiUrl}api/auth/login`
       : authType === "register"
-      ? `${apiUrl}api/auth/register`
-      : "";
+        ? `${apiUrl}api/auth/register`
+        : "";
 
-      console.log("isAuthenticated:", isAuthenticated);
+  console.log("isAuthenticated:", isAuthenticated);
 
   // ────────── CORE AUTH HANDLER ──────────
   const userAuthHandler = async () => {
@@ -61,33 +62,33 @@ export default function AuthScreen() {
         return;
       };
 
-      Toast.show({ type: "success", text1:"Success!", text2:message, text1Style:{fontWeight:"bold", color:"green"}});
+      Toast.show({ type: "success", text1: "Success!", text2: message, text1Style: { fontWeight: "bold", color: "green" } });
       // Store user data with token
       const userDataToStore = { ...finalUserData, token };
       await AsyncStorage.setItem("userData", JSON.stringify(userDataToStore));
       console.log("User data stored:", userDataToStore);
-      
+
       setData(initialData);
       await getLocalStorageUser();
     } catch (error) {
-        console.log("error:", error)
-        setError(error?.response?.data.message || error.message || "Something went wrong");
+      console.log("error:", error)
+      setError(error?.response?.data.message || error.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
- const handleFormSubmission = () => {
+  const handleFormSubmission = () => {
     if (!data.email || !data.password) {
       setError("Please fill in all required fields");
       return;
     }
-    
+
     if (authType === "register" && (!data.name || !data.number)) {
       setError("Please fill in all required fields");
       return;
     }
-    
+
     userAuthHandler();
   };
 
@@ -109,7 +110,7 @@ export default function AuthScreen() {
   // show toast for explicit `error`
   useEffect(() => {
     if (error) {
-        console.log("error:", error)
+      console.log("error:", error)
       Toast.show({ type: "error", text1: error });
       const t = setTimeout(() => setError(""), 3000);
       return () => clearTimeout(t);
@@ -132,8 +133,8 @@ export default function AuthScreen() {
           {authType === "register"
             ? "Create Account"
             : authType === "login"
-            ? "Login to Chipsub"
-            : "Reset Password"}
+              ? "Login to Chipsub"
+              : "Reset Password"}
         </Text>
 
         {authType === "register" && (
@@ -164,13 +165,25 @@ export default function AuthScreen() {
         )}
 
         {authType !== "reset password" && (
-          <TextInput
-            placeholder="Password"
-            secureTextEntry
-            style={styles.input}
-            value={data.password}
-            onChangeText={(v) => handleOnChange("password", v)}
-          />
+          <View style={styles.passwordWrapper}>
+            <TextInput
+              placeholder="Password"
+              secureTextEntry={!showPassword}
+              style={[styles.input, { paddingRight: 40 }]}
+              value={data.password}
+              onChangeText={(v) => handleOnChange("password", v)}
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword((prev) => !prev)}
+            >
+              <MaterialIcons
+                name={showPassword ? "visibility" : "visibility-off"}
+                size={22}
+                color="#666"
+              />
+            </TouchableOpacity>
+          </View>
         )}
 
         {authType === "login" && (
@@ -248,6 +261,17 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
   },
+  passwordWrapper: {
+  position: "relative",
+  justifyContent: "center",
+},
+eyeIcon: {
+  position: "absolute",
+  right: 12,
+  top: 12,
+  zIndex: 1,
+},
+
   button: {
     backgroundColor: "#2563eb",
     padding: 14,

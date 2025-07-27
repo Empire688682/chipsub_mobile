@@ -13,40 +13,8 @@ import { useGlobalContext } from '../../lib/GlobalContext';
 const { width } = Dimensions.get('window');
 
 const DashboardAnimation = () => {
-  const {  apiUrl, userData } = useGlobalContext();
-  const [allData, setAllData] = useState({});
+  const { allData } = useGlobalContext();
 const scrollX = new Animated.Value(0);
-
-  const fetchAllData = async () => {
-    try {
-        const mobileUserId = userData.userId
-      const response = await axios.get(`${apiUrl}api/all-data`, {params:{mobileUserId:mobileUserId}} );
-      console.log("response:", response);
-      if (response.data.success) {
-        setAllData(response.data.data);
-      }
-    } catch (error) {
-      console.log("Error:", error);
-    }
-  };
-
-//   const onRefresh = async () => {
-//     setRefreshing(true);
-//     await fetchAllData();
-//     setRefreshing(false);
-//   };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchAllData();
-    }, 180000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    fetchAllData();
-  }, []);
 
   // Animate the scrolling text
   useEffect(() => {
@@ -63,7 +31,7 @@ const scrollX = new Animated.Value(0);
     if (Object.keys(allData).length > 0) {
       animateScroll();
     }
-  }, [allData]);
+  }, [allData, scrollX]);
 
   const scrollingText = `👥 Active Users: ${allData.users || 0} • 📱 Airtime Purchases: ${allData.airtime || 0} • 📶 Data Purchases: ${allData.data || 0} • 📺 TV Subscriptions: ${allData.tv || 0} • ⚡ Electricity Tokens: ${allData.electricity || 0} • 💰 Wallet Fundings: ₦${allData.walletsTotal || 0} • 🎁 Commissions Paid: ₦${allData.totalReward || 0}`;
 

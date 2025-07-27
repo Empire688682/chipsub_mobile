@@ -32,7 +32,7 @@ export default function TabsLayout() {
   /* ----- Auto‑close drawer on route change ----- */
   useEffect(() => {
     setIsDrawerOpen(false);
-  }, [pathname]);
+  }, [pathname, setIsDrawerOpen]);
 
   /* ----- Animate drawer whenever state flips ----- */
   useEffect(() => {

@@ -23,8 +23,8 @@ export default function DashboardScreen({ navigation }) {
   const [withdrawLoading, setWithdrawLoading] = useState(false);
   const [index, setIndex] = useState(5);
 
-  const firstName = userData.name.split(" ")[0];
-  const referralLink = `https://chipsub.vercel.app?ref=${userData.userId}`;
+  const firstName = userData?.name?.split(" ")[0];
+  const referralLink = `https://chipsub.vercel.app?ref=${userData?.userId}`;
 
   /* ACTIONS */
   const handleCopy = async () => {
