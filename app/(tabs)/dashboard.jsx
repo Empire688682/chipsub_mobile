@@ -19,7 +19,7 @@ import DashboardAnimation from "../components/DashboardAnimation";
 
 export default function DashboardScreen({ navigation }) {
   /* STATE */
-  const {userTransactionData, userData} = useGlobalContext();
+  const {userTransactionData, userData, router} = useGlobalContext();
   const [withdrawLoading, setWithdrawLoading] = useState(false);
   const [index, setIndex] = useState(5);
 
@@ -42,12 +42,6 @@ export default function DashboardScreen({ navigation }) {
           <Feather name="heart" size={16} color="#2563eb" /> Welcome back,&nbsp;
           <Text style={styles.bold}>{firstName}</Text>
         </Text>
-        <Feather
-          name="bell"
-          size={20}
-          color="#6b7280"
-          onPress={() => navigation?.navigate?.("notifications")}
-        />
       </View>
 
       {/* Wallet & Commission */}
@@ -90,7 +84,7 @@ export default function DashboardScreen({ navigation }) {
           <TouchableOpacity
             key={item.label}
             style={styles.quickItem}
-            onPress={() => navigation?.navigate?.(item.route)}
+            onPress={() => router.push(`/(tabs)/${item.route}`)}
           >
             <item.Icon name={item.iconName} size={28} color="#2563eb" />
             <Text style={styles.quickLabel}>{item.label}</Text>

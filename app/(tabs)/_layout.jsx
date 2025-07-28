@@ -7,6 +7,7 @@ import {
   Animated,
   Dimensions,
   Text,
+  View,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -26,8 +27,8 @@ export default function TabsLayout() {
     userData,
   } = useGlobalContext();
 
-  const pathname = usePathname();         
-  const slideX = useRef(new Animated.Value(-width )).current;
+  const pathname = usePathname();
+  const slideX = useRef(new Animated.Value(-width)).current;
 
   /* ----- Auto‑close drawer on route change ----- */
   useEffect(() => {
@@ -52,15 +53,6 @@ export default function TabsLayout() {
         end={{ x: 1, y: 0 }}
         style={styles.menuBar}
       >
-        {/* Logo press -> home & close drawer */}
-        <Pressable onPress={() => { router.push("/"); setIsDrawerOpen(false); }}>
-          <Image
-            source={require("../../assets/images/chipsub.png")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </Pressable>
-
         {/* User info */}
         <Pressable
           style={styles.user}
@@ -74,13 +66,24 @@ export default function TabsLayout() {
             }
             style={styles.avatar}
           />
-          <Text style={styles.userName}>{userData?.name?.split(" ")[0] ?? "User"}</Text>
+          <Text style={styles.userName}>Hi, {userData?.name?.split(" ")[0]}</Text>
         </Pressable>
 
-        {/* Drawer toggle */}
-        <Pressable onPress={toggleDrawer} style={{ paddingRight: 20 }}>
+        {/* Right icons */}
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Pressable onPress={toggleDrawer} style={{ paddingRight: 20 }}>
           <MaterialIcons name="menu" size={30} color="#fff" />
         </Pressable>
+        <Pressable>
+          <MaterialIcons
+           name="notifications-on"
+            size={24}
+             color="white"
+             onPress={() => router.push("/(tabs)/notifications")}
+           />
+        </Pressable>
+        </View>
+        
       </LinearGradient>
 
       {/* Animated drawer */}
@@ -112,7 +115,7 @@ const styles = StyleSheet.create({
     zIndex: 30,
   },
   logo: { width: 120, height: 110 },
-  user: { flexDirection: "row", alignItems: "center", marginRight: 10 },
+  user: { flexDirection: "row", alignItems: "center", marginLeft: 10 },
   avatar: { width: 32, height: 32, borderRadius: 16, marginRight: 6 },
   userName: { color: "#fff", fontSize: 14, fontWeight: "600" },
 });

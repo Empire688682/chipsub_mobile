@@ -6,7 +6,7 @@ import { useGlobalContext } from '../../lib/GlobalContext';
 import Wallet from '../components/Wallet';
 
 const BuyAirtime = () => {
-  const { setPinModal, getUserRealTimeData } = useGlobalContext();
+  const { apiUrl, setPinModal, getUserRealTimeData, mobileUserId } = useGlobalContext();
   const [data, setData] = useState({
     network: "",
     amount: "",
@@ -25,6 +25,7 @@ const BuyAirtime = () => {
 
   const handleFormSubmission = () => {
     if (!data.network) return showError("Please select a network");
+    Alert.alert("Success", "Please select a network");
     if (!data.amount || parseInt(data.amount) < 50) return showError("Amount must be at least ₦50");
     if (!/^\d{11}$/.test(data.number)) return showError("Enter a valid 11-digit phone number");
     if (data.pin.length < 4) return showError("PIN must be at least 4 digits");
@@ -40,8 +41,12 @@ const BuyAirtime = () => {
 
   const buyAirtime = async () => {
     setLoading(true);
+    const postData = data;
+    postData.mobileUserId = mobileUserId;
     try {
-      const response = await axios.post("/api/provider/airtime-provider", { data });
+      const response = await axios.post(`${apiUrl}api/provider/airtime-provider`, 
+        { data: postData });
+        console.log("Airtime Response:", response.data);
       if (response.data.success) {
         getUserRealTimeData();
         Alert.alert("Success", response.data.message);
@@ -49,6 +54,7 @@ const BuyAirtime = () => {
       }
     } catch (error) {
       showError(error?.response?.data?.message || "An error occurred");
+      console.log("Airtime error:", error);
       if (
         error?.response?.data?.message === "1234 is not allowed" ||
         error?.response?.data?.message === "Pin not activated yet!"

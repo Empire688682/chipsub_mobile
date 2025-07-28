@@ -16,6 +16,7 @@ export function AppProvider({ children }) {
   const [authChecked, setAuthChecked] = useState(false);
   const [userTransactionData, setUserTransactionData] = useState({});
   const [allData, setAllData] = useState({});
+  const mobileUserId = userData?.userId;
 
   const getLocalStorageUser = async () => {
     try {
@@ -53,18 +54,16 @@ export function AppProvider({ children }) {
 
   const fetchUserTransactionData = useCallback(async () => {
     if (!isAuthenticated) return;
-    const mobileUserId = userData.userId;
     try {
       const response = await axios.get(apiUrl + "api/real-time-data", { params: { mobileUserId: mobileUserId } });
       setUserTransactionData(response.data.data)
     } catch (error) {
       console.log("FetchUserTransc:", error)
     }
-  }, [isAuthenticated, userData.userId, apiUrl]);
+  }, [isAuthenticated, apiUrl, mobileUserId]);
 
   const fetchAllData = async () => {
     if (!isAuthenticated) return;
-    const mobileUserId = userData.userId;
     try {
       const response = await axios.get(`${apiUrl}api/all-data`, { params: { mobileUserId: mobileUserId } });
       console.log("response:", response);
@@ -116,6 +115,7 @@ export function AppProvider({ children }) {
       isAuthenticated,
       setIsAuthenticated,
       userData,
+      mobileUserId,
       authChecked,
       getLocalStorageUser,
       setAuthChecked,
