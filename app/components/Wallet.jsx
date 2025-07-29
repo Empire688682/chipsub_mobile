@@ -1,21 +1,32 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useGlobalContext } from "../../lib/GlobalContext";
 
 
 const Wallet = () => {
-    const {userTransactionData} = useGlobalContext()
+    const {userTransactionData, router} = useGlobalContext()
     return (
         <View style={styles.bigCard}>
-            <Text style={styles.label}>Wallet Balance</Text>
+           <View>
+             <Text style={styles.label}>Wallet Balance</Text>
             <Text style={styles.bigMoney}>₦{userTransactionData?.walletBalance}</Text>
+           </View>
+           <Pressable 
+           style={styles.btn}
+            onPress={() => router.push("/fund-wallet")}>
+            Fund +
+           </Pressable>
         </View>
     )
 }
 
 const styles = StyleSheet.create({
   bigCard: {
-    flex: 1,
     backgroundColor: "#fff",
+    flex: 1,
+    flexDirection:"row",
+    gap:10,
+    alignItems:"center",
+    justifyContent:"space-between",
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -26,7 +37,17 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-
+  btn:{ 
+    flexDirection: "row",
+    color: "#fff",
+    backgroundColor: "#2563eb",
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    alignItems: "center",
+    marginLeft: 8,
+    flexWrap:"wrap",
+  },
   label: { color: "#6b7280", fontSize: 13 },
   bigMoney: { fontWeight: "700", fontSize: 20, marginTop: 4 },
 })

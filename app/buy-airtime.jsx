@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Alert, Button, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
-import { useGlobalContext } from '../../lib/GlobalContext';
-import Wallet from '../components/Wallet';
+import { useGlobalContext } from '../lib/GlobalContext';
+import Wallet from './components/Wallet';
 
 const BuyAirtime = () => {
   const { apiUrl, setPinModal, getUserRealTimeData, mobileUserId } = useGlobalContext();
