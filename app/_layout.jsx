@@ -16,12 +16,12 @@ function AuthLayoutHandler() {
     if (!authChecked) return;
 
     // Redirect to auth screen if not authenticated
-    if (!isAuthenticated && pathname !== "/auth") {
-      router.replace("/auth");
+    if (!isAuthenticated && pathname !== "/auth-screen") {
+      router.replace("/auth-screen");
     }
 
     // Redirect to home if already authenticated but still on auth page
-    if (isAuthenticated && pathname === "/auth") {
+    if (isAuthenticated && pathname === "/auth-screen") {
       router.replace("/(tabs)");
     }
   }, [authChecked, isAuthenticated, pathname, router]);
@@ -56,6 +56,7 @@ function AuthLayoutHandler() {
           <Stack.Screen name="crypto" options={{ title: "Crypto" }} />
           <Stack.Screen name="gift-card" options={{ title: "Gift Card" }} />
           <Stack.Screen name="transaction-history" options={{ title: "Transactions" }} />
+          <Stack.Screen name="auth-screen" options={{headerShown: false}} />
         </Stack>
       </PaperProvider>
     </SafeAreaProvider>

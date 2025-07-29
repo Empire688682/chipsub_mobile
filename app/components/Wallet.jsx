@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { useGlobalContext } from "../../lib/GlobalContext";
 
 
@@ -10,11 +11,10 @@ const Wallet = () => {
              <Text style={styles.label}>Wallet Balance</Text>
             <Text style={styles.bigMoney}>₦{userTransactionData?.walletBalance}</Text>
            </View>
-           <Pressable 
-           style={styles.btn}
-            onPress={() => router.push("/fund-wallet")}>
-            Fund +
-           </Pressable>
+           <TouchableOpacity style={styles.btn} onPress={() => router.push("/fund-wallet")}>
+                         <Feather name="corner-right-up" size={18} color="#fff" />
+                         <Text style={styles.btnText}>Fund</Text>
+                       </TouchableOpacity>
         </View>
     )
 }
@@ -22,14 +22,14 @@ const Wallet = () => {
 const styles = StyleSheet.create({
   bigCard: {
     backgroundColor: "#fff",
-    flex: 1,
+    minWidth: "50%",
     flexDirection:"row",
-    gap:10,
+    flexWrap:"wrap",
     alignItems:"center",
     justifyContent:"space-between",
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 40,
     marginHorizontal: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
   },
   btn:{ 
     flexDirection: "row",
-    color: "#fff",
     backgroundColor: "#2563eb",
     borderRadius: 6,
     paddingHorizontal: 8,
@@ -48,6 +47,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     flexWrap:"wrap",
   },
+  btnText: { color: "#fff", marginLeft: 4, fontSize: 15, fontWeight: "600" },
   label: { color: "#6b7280", fontSize: 13 },
   bigMoney: { fontWeight: "700", fontSize: 20, marginTop: 4 },
 })

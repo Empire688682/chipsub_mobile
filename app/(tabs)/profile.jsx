@@ -14,14 +14,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGlobalContext } from '../../lib/GlobalContext';
 
-// Mock data to replace useGlobalContext
-const mockUserData = {
-  name: 'John Doe',
-  email: 'john.doe@example.com',
-  number: '+1234567890',
-  bvnVerify: false,
-};
-
 const mockTransactionHistory = [
   {
     _id: 'TXN001',
@@ -61,25 +53,15 @@ const mockTransactionHistory = [
 ];
 
 const ProfileScreen = () => {
-  const {userData} = useGlobalContext()
+  const {userData, logout} = useGlobalContext()
   const [notify, setNotify] = useState(true);
-  const [loading, setLoading] = useState(true);
   const [postLoading, setPostLoading] = useState(false);
-  const [transactionHistory, setTransactionHistory] = useState([]);
 
   const [pwdForm, setPwdForm] = useState({
     currentPwd: '',
     newPwd: '',
     repeatPwd: '',
   });
-
-  useEffect(() => {
-    // Simulate API call delay
-    setTimeout(() => {
-      setTransactionHistory(mockTransactionHistory);
-      setLoading(false);
-    }, 1500);
-  }, []);
 
   const user = {
     name: userData.name || '',
@@ -142,7 +124,7 @@ const ProfileScreen = () => {
       'Are you sure you want to logout?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Logout', style: 'destructive', onPress: () => showToast('Logged out successfully') },
+        { text: 'Logout', style: 'destructive', onPress: () => logout() },
       ]
     );
   };
@@ -254,43 +236,6 @@ const ProfileScreen = () => {
                 )}
               </TouchableOpacity>
             </View>
-          </View>
-
-          {/* Transaction History Card */}
-          <View style={styles.transactionCard}>
-            <Text style={styles.sectionTitle}>📋 Transaction History</Text>
-            
-            {loading ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#4F46E5" />
-                <Text style={styles.loadingText}>Loading...</Text>
-              </View>
-            ) : (
-              <ScrollView style={styles.transactionList} nestedScrollEnabled>
-                {transactionHistory.map((tx, index) => (
-                  <View key={index} style={styles.transactionItem}>
-                    <View style={styles.transactionLeft}>
-                      <Text style={styles.transactionType}>{tx.type}</Text>
-                      <View style={styles.transactionDetails}>
-                        <Text style={styles.transactionAmount}>{tx.amount}</Text>
-                        <Text style={styles.transactionDate}>{tx.date}</Text>
-                      </View>
-                    </View>
-                    <View style={styles.transactionRight}>
-                      <Text
-                        style={[
-                          styles.transactionStatus,
-                          { color: tx.status === 'success' ? '#10B981' : '#EF4444' },
-                        ]}
-                      >
-                        {tx.status}
-                      </Text>
-                      <Text style={styles.transactionId}>Id: {tx._id}</Text>
-                    </View>
-                  </View>
-                ))}
-              </ScrollView>
-            )}
           </View>
         </View>
       </ScrollView>
