@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import { useGlobalContext } from "../../lib/GlobalContext";
+import { useGlobalContext } from "../lib/GlobalContext";
 const Transaction = () => {
   return (
     <View>

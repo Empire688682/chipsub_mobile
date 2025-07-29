@@ -6,22 +6,12 @@ import Header from "../components/Header";
 export default function TabsLayout() {
   return (
     <>
-    <Header />
-      <Tabs
-        screenOptions={{
-          headerShown: false,
-          tabBarActiveTintColor: "#3b82f6",
-          tabBarInactiveTintColor: "#999",
-          tabBarStyle: {
-            height: 60,
-            paddingBottom: 8,
-            backgroundColor: "#fff",
-            borderTopColor: "#eee",
-            borderTopWidth: 1,
-          },
-          tabBarLabelStyle: { fontSize: 12 },
-        }}
-      >
+      <Header />
+      <Tabs screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "#6200ee",
+        tabBarInactiveTintColor: "#666666"
+      }}>
         <Tabs.Screen
           name="index"
           options={{

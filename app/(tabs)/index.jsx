@@ -125,7 +125,7 @@ export default function DashboardScreen({ navigation }) {
           )}
         />
         {userTransactionData?.transactions?.length > 5 && (
-          <TouchableOpacity style={{ alignSelf: "center", marginTop: 12 }} onPress={() => setIndex(index + 3)}>
+          <TouchableOpacity style={{ alignSelf: "center", marginTop: 12 }} onPress={() => router.push("/transaction-history")}>
             <Text style={{ color: "#2563eb", fontWeight: "600" }}>See More →</Text>
           </TouchableOpacity>
         )}

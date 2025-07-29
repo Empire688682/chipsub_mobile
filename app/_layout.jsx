@@ -1,6 +1,6 @@
 // app/_layout.js or app/_layout.tsx
 
-import { Slot, useRouter, usePathname } from "expo-router";
+import { useRouter, usePathname, Stack } from "expo-router";
 import { useEffect } from "react";
 import { View, ActivityIndicator, Text } from "react-native";
 import { PaperProvider } from "react-native-paper";
@@ -38,7 +38,25 @@ function AuthLayoutHandler() {
   return (
     <SafeAreaProvider>
       <PaperProvider>
-        <Slot />
+        <Stack screenOptions={{
+          headerStyle: {
+            elevation: 0, // for Android
+            shadowOpacity: 0, // for iOS
+            borderBottomWidth: 0,
+            backgroundColor:"#F9FAFB"
+          },
+        }}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="contact" options={{ title: "Contact" }} />
+          <Stack.Screen name="fund-wallet" options={{ title: "Wallet" }} />
+          <Stack.Screen name="buy-electricity" options={{ title: "Electricity" }} />
+          <Stack.Screen name="buy-tv" options={{ title: "TV" }} />
+          <Stack.Screen name="buy-airtime" options={{ title: "Airtime" }} />
+          <Stack.Screen name="buy-data" options={{ title: "Data" }} />
+          <Stack.Screen name="crypto" options={{ title: "Crypto" }} />
+          <Stack.Screen name="gift-card" options={{ title: "Gift Card" }} />
+          <Stack.Screen name="transaction-history" options={{ title: "Transactions" }} />
+        </Stack>
       </PaperProvider>
     </SafeAreaProvider>
   );
