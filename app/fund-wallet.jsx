@@ -11,16 +11,11 @@ import {
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-// Mock user data to replace useGlobalContext
-const mockUserData = {
-  name: 'John Doe',
-  email: 'john.doe@example.com',
-};
+import { useGlobalContext } from '../lib/GlobalContext';
 
 const FundWalletScreen = () => {
-  const [userData] = useState(mockUserData);
-  const [form, setForm] = useState({ amount: '' });
+  const {userData, apiUrl} = useGlobalContext()
+  const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
 
   const showToast = (message, type = 'info') => {
@@ -28,10 +23,6 @@ const FundWalletScreen = () => {
       type === 'error' ? 'Error' : type === 'success' ? 'Success' : 'Info',
       message
     );
-  };
-
-  const handleChange = (name, value) => {
-    setForm({ ...form, [name]: value });
   };
 
   const openPaymentLink = async (url) => {
@@ -43,61 +34,54 @@ const FundWalletScreen = () => {
         showToast('Cannot open payment link', 'error');
       }
     } catch (error) {
+      console.log("Error:", error)
       showToast('Failed to open payment link', 'error');
     }
   };
 
-  const handleSubmit = async () => {
-    const amount = parseInt(form.amount);
+    console.log(isNaN(userData));
 
-    if (!form.amount || isNaN(amount) || amount < 100) {
+  const handleSubmit = async () => {
+    const amountToInterger = parseInt(amount);
+
+    if (isNaN(amountToInterger) || amountToInterger < 100) {
       return showToast('Enter a valid amount (min ₦100)', 'error');
     }
 
     setLoading(true);
     showToast('Initializing payment...');
 
+   setLoading(true);
+    showToast("Initializing payment...", "info");
+
     try {
-      // Simulate API call to initiate payment
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const res = await fetch(`${apiUrl}/api/initiate-payment`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          amount: amountToInterger,
+          email: userData.email,
+          name: userData.name,
+          mobileUserId:userData.id
+        })
+      });
 
-      // Mock successful payment initiation
-      const mockResponse = {
-        success: true,
-        link: 'https://checkout.flutterwave.com/v3/hosted/pay/mock-payment-link',
-        message: 'Payment initialized successfully'
-      };
+      const response = await res.json();
 
-      console.log('Payment response:', mockResponse);
+      console.log("response:", response)
 
-      if (mockResponse.success && mockResponse.link) {
-        showToast('Redirecting to Flutterwave...', 'success');
-        
-        // In a real app, you would open the payment link
-        // For demo purposes, we'll just show a success message
-        Alert.alert(
-          'Payment Redirect',
-          'In a real app, this would redirect to Flutterwave payment page.',
-          [
-            {
-              text: 'Cancel',
-              style: 'cancel',
-            },
-            {
-              text: 'Open Payment Link',
-              onPress: () => openPaymentLink(mockResponse.link),
-            },
-          ]
-        );
-        
-        // Reset form after successful initiation
-        setForm({ amount: '' });
+      if (response.success && response.link) {
+        showToast("Redirecting to Flutterwave...", "success");
+        openPaymentLink(response.link);
       } else {
-        showToast(mockResponse.message || 'Payment failed', 'error');
+        console.log(response);
+        showToast(response?.data?.message || "Payment failed");
       }
     } catch (err) {
-      console.error('Payment error:', err);
-      showToast('Something went wrong. Please try again.', 'error');
+      console.error(err);
+      showToast("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -131,8 +115,8 @@ const FundWalletScreen = () => {
               <Text style={styles.inputLabel}>Amount (₦)</Text>
               <TextInput
                 style={styles.input}
-                value={form.amount}
-                onChangeText={(value) => handleChange('amount', value)}
+                value={amount}
+                onChangeText={(value) => setAmount(value)}
                 placeholder="Minimum ₦100"
                 keyboardType="numeric"
                 placeholderTextColor="#9CA3AF"

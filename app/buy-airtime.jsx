@@ -6,7 +6,7 @@ import { useGlobalContext } from '../lib/GlobalContext';
 import Wallet from './components/Wallet';
 
 const BuyAirtime = () => {
-  const { apiUrl, setPinModal, getUserRealTimeData, mobileUserId } = useGlobalContext();
+  const { apiUrl, setPinModal, fetchUserTransactionData, mobileUserId } = useGlobalContext();
   const [data, setData] = useState({
     network: "",
     amount: "",
@@ -25,7 +25,6 @@ const BuyAirtime = () => {
 
   const handleFormSubmission = () => {
     if (!data.network) return showError("Please select a network");
-    Alert.alert("Success", "Please select a network");
     if (!data.amount || parseInt(data.amount) < 50) return showError("Amount must be at least ₦50");
     if (!/^\d{11}$/.test(data.number)) return showError("Enter a valid 11-digit phone number");
     if (data.pin.length < 4) return showError("PIN must be at least 4 digits");
@@ -48,9 +47,9 @@ const BuyAirtime = () => {
         { data: postData });
         console.log("Airtime Response:", response.data);
       if (response.data.success) {
-        getUserRealTimeData();
         Alert.alert("Success", response.data.message);
         setData({ network: "", amount: "", number: "", pin: "" });
+        fetchUserTransactionData();
       }
     } catch (error) {
       showError(error?.response?.data?.message || "An error occurred");
