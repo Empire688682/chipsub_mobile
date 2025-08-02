@@ -24,6 +24,17 @@ const  ToastUi = {
       </View>
     </View>
   ),
+  info: (props) => (
+    <View style={toastStyles.infoToast}>
+      <View style={toastStyles.iconContainer}>
+        <Text style={toastStyles.errorIcon}>✕</Text>
+      </View>
+      <View style={toastStyles.textContainer}>
+        <Text style={toastStyles.errorTitle}>{props.text1}</Text>
+        <Text style={toastStyles.errorMessage}>{props.text2}</Text>
+      </View>
+    </View>
+  ),
 };
 
 // Toast styles
@@ -73,6 +84,30 @@ const toastStyles = StyleSheet.create({
     zIndex:999,
     borderLeftWidth: 4,
     borderLeftColor: '#dc2626',
+    position: 'absolute'
+  },
+
+  // Info Toast
+  infoToast: {
+    height: 70,
+    width: '90%',
+    backgroundColor: '#36e0e6ff',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 999,
+    zIndex:999,
+    borderLeftWidth: 4,
+    borderLeftColor: '#10dee6ff',
     position: 'absolute'
   },
   
