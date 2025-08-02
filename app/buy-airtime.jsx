@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, Button, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import { useGlobalContext } from '../lib/GlobalContext';
 import Wallet from './components/Wallet';
+import Toast from "react-native-toast-message";
+import ToastUi from '../utils/ToastUi';
 
 const BuyAirtime = () => {
   const { apiUrl, setPinModal, fetchUserTransactionData, mobileUserId } = useGlobalContext();
@@ -19,18 +21,26 @@ const BuyAirtime = () => {
     setData({ ...data, [name]: value });
   };
 
-  const showError = (message) => {
-    Alert.alert("Error", message);
-  };
+    const showToast = (type, message) => {
+      Toast.show({
+        type: type,
+        text1: type === "success" ? "Success!" : "Error!",
+        text2: message,
+        position: "top",
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 60,
+      });
+    };
 
   const handleFormSubmission = () => {
-    if (!data.network) return showError("Please select a network");
-    if (!data.amount || parseInt(data.amount) < 50) return showError("Amount must be at least ₦50");
-    if (!/^\d{11}$/.test(data.number)) return showError("Enter a valid 11-digit phone number");
-    if (data.pin.length < 4) return showError("PIN must be at least 4 digits");
+    if (!data.network) return showToast("error", "Please select a network");
+    if (!data.amount || parseInt(data.amount) < 50) return showToast("error", "Amount must be at least ₦50");
+    if (!/^\d{11}$/.test(data.number)) return showToast("error", "Enter a valid 11-digit phone number");
+    if (data.pin.length < 4) return showToast("error", "PIN must be at least 4 digits");
 
     if (data.pin === "1234") {
-      showError("1234 is not allowed");
+      showToast("error", "1234 is not allowed");
       setTimeout(() => setPinModal(true), 2000);
       return;
     }
@@ -47,12 +57,12 @@ const BuyAirtime = () => {
         { data: postData });
         console.log("Airtime Response:", response.data);
       if (response.data.success) {
-        Alert.alert("Success", response.data.message);
-        setData({ network: "", amount: "", number: "", pin: "" });
         fetchUserTransactionData();
+        showToast("success", response.data.message);
+        setData({ network: "", amount: "", number: "", pin: "" });
       }
     } catch (error) {
-      showError(error?.response?.data?.message || "An error occurred");
+      showToast( "error", error?.response?.data?.message || "An error occurred");
       console.log("Airtime error:", error);
       if (
         error?.response?.data?.message === "1234 is not allowed" ||
@@ -133,6 +143,7 @@ const BuyAirtime = () => {
           <Text style={styles.buttonText}>Buy Now</Text>
         )}
       </TouchableOpacity>
+      <Toast config={ToastUi} />
 
       {/* <AirtimeHelp data={data} /> */}
     </View>

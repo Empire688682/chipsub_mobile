@@ -1,187 +1,341 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, Button, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  StyleSheet,
+} from "react-native";
 import { Picker } from '@react-native-picker/picker';
+import Toast from "react-native-toast-message";
 import axios from 'axios';
 import { useGlobalContext } from '../lib/GlobalContext';
 import Wallet from './components/Wallet';
+import {applyMarkup} from "../utils/helper";
+import ToastUi from '../utils/ToastUi';
 
 const BuyData = () => {
-  const { apiUrl, setPinModal, getUserRealTimeData, mobileUserId } = useGlobalContext();
-  const [data, setData] = useState({
+  const { apiUrl, setPinModal, dataPlan, fetchUserTransactionData, mobileUserId } = useGlobalContext();
+  const [form, setForm] = useState({
     network: "",
+    plan: "",
+    planId: "",
     amount: "",
     number: "",
     pin: "",
   });
+
+  const [availablePlans, setAvailablePlans] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (name, value) => {
-    setData({ ...data, [name]: value });
-  };
+    // State to store profit configuration for pricing (type and value)
+  const [profitConfig, setProfitConfig] = useState({
+    type: "percentage", 
+    value: 3.5,          
+  });
 
-  const showError = (message) => {
-    Alert.alert("Error", message);
-  };
-
-  const handleFormSubmission = () => {
-    if (!data.network) return showError("Please select a network");
-    Alert.alert("Success", "Please select a network");
-    if (!data.amount || parseInt(data.amount) < 50) return showError("Amount must be at least ₦50");
-    if (!/^\d{11}$/.test(data.number)) return showError("Enter a valid 11-digit phone number");
-    if (data.pin.length < 4) return showError("PIN must be at least 4 digits");
-
-    if (data.pin === "1234") {
-      showError("1234 is not allowed");
-      setTimeout(() => setPinModal(true), 2000);
-      return;
+  // Helper function for your rounding rule (nearest 10, rounding .5 and up)
+  function roundToNearestTen(num) {
+    const remainder = num % 10;
+    if (remainder >= 5) {
+      return num + (10 - remainder); // round up
+    } else {
+      return num - remainder; // round down
     }
+  }
 
-    buyData();
+  const handleNetworkChange = (selected) => {
+    setForm({ ...form, network: selected, plan: "", amount: "" });
+
+    const plans = dataPlan?.MOBILE_NETWORK?.[selected]?.[0]?.PRODUCT || [];
+
+    const enhancedPlans = plans.map((item) => {
+      const basePrice = Number(item.PRODUCT_AMOUNT);
+      const priceWithMarkup = applyMarkup(
+        basePrice,
+        profitConfig.type,
+        profitConfig.value
+      );
+      const roundedPrice = roundToNearestTen(priceWithMarkup);
+
+      return {
+        name: item.PRODUCT_NAME,
+        code: item.PRODUCT_ID,
+        price: basePrice,
+        sellingPrice: roundedPrice,
+      };
+    });
+
+    setAvailablePlans(enhancedPlans);
   };
 
-  const buyData = async () => {
-    setLoading(true);
-    const postData = data;
-    postData.mobileUserId = mobileUserId;
+  const handlePlanChange = (selected) => {
+    const plan = availablePlans.find((p) => p.name === selected);
+    if (plan) {
+      setForm({
+        ...form,
+        plan: selected,
+        planId: plan.code,
+        amount: plan.sellingPrice.toString(),
+      });
+    }
+  };
+
+  const handleInputChange = (name, value) => {
+    setForm({ ...form, [name]: value });
+  };
+
+  // Enhanced toast function with custom styling
+  const showToast = (type, message) => {
+    Toast.show({
+      type: type,
+      text1: type === "success" ? "Success!" : "Error!",
+      text2: message,
+      position: "top",
+      visibilityTime: 4000,
+      autoHide: true,
+      topOffset: 60,
+    });
+  };
+
+  const handleSubmit = async () => {
+    if (!form.network) return showToast("error", "Please select a network");
+    if (!form.plan) return showToast("error", "Please choose a data plan");
+    if (!/^\d{11}$/.test(form.number))
+      return showToast("error", "Enter a valid 11-digit phone number");
+    if (form.pin.length < 4)
+      return showToast("error", "PIN must be 4 digits");
+
     try {
-      const response = await axios.post(`${apiUrl}api/provider/airtime-provider`, 
-        { data: postData });
-        console.log("Airtime Response:", response.data);
-      if (response.data.success) {
-        getUserRealTimeData();
-        Alert.alert("Success", response.data.message);
-        setData({ network: "", amount: "", number: "", pin: "" });
+      setLoading(true);
+      const postData = {...form, mobileUserId}
+      const res = await axios.post(`${apiUrl}api/provider/data-provider`, postData);
+
+      if (res.data.success) {
+        fetchUserTransactionData();
+        showToast("success", "Data purchase successful!");
+
+        setForm({
+          network: "",
+          plan: "",
+          planId: "",
+          amount: "",
+          number: "",
+          pin: "",
+        });
+        setAvailablePlans([]);
       }
     } catch (error) {
-      showError(error?.response?.data?.message || "An error occurred");
-      console.log("Airtime error:", error);
-      if (
-        error?.response?.data?.message === "1234 is not allowed" ||
-        error?.response?.data?.message === "Pin not activated yet!"
-      ) {
-        setTimeout(() => setPinModal(true), 2000);
-      }
+      console.log("Error:", error);
+      showToast(
+        "error",
+        error.response?.data?.message || "Something went wrong"
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  if (!dataPlan) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#2563eb" />
+        <Text style={styles.loadingText}>Loading.....</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Wallet />
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>Buy your Data</Text>
 
-      <Text style={styles.title}>Buy Airtime</Text>
+        {/* Network Picker */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Select Network</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={form.network}
+              onValueChange={handleNetworkChange}
+              style={styles.picker}
+            >
+              <Picker.Item label="-- Choose Network --" value="" />
+              {Object.keys(dataPlan?.MOBILE_NETWORK || {}).map((net, i) => (
+                <Picker.Item label={net} value={net} key={i} />
+              ))}
+            </Picker>
+          </View>
+        </View>
 
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Select Network</Text>
-        <Picker
-          selectedValue={data.network}
-          onValueChange={(value) => handleChange('network', value)}
-          style={styles.input}
+        {/* Data Plan Picker */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Choose Data Plan</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={form.plan}
+              onValueChange={handlePlanChange}
+              style={styles.picker}
+              enabled={availablePlans.length > 0}
+            >
+              <Picker.Item label="-- Choose Plan --" value="" />
+              {availablePlans.map((p, i) => (
+                <Picker.Item
+                  key={i}
+                  label={`${p.name} - ₦${p.sellingPrice}`}
+                  value={p.name}
+                />
+              ))}
+            </Picker>
+          </View>
+        </View>
+
+        {/* Amount (readonly) */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Amount</Text>
+          <TextInput
+            style={[styles.input, styles.readOnlyInput]}
+            value={form.amount}
+            editable={false}
+            placeholder="Amount will appear here"
+          />
+        </View>
+
+        {/* Phone Number */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Phone Number</Text>
+          <TextInput
+            style={styles.input}
+            value={form.number}
+            onChangeText={(value) => handleInputChange("number", value)}
+            placeholder="e.g. 08012345678"
+            keyboardType="phone-pad"
+            maxLength={11}
+          />
+        </View>
+
+        {/* PIN */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Enter PIN</Text>
+          <TextInput
+            style={styles.input}
+            value={form.pin}
+            onChangeText={(value) => handleInputChange("pin", value)}
+            placeholder="4 digit PIN"
+            secureTextEntry
+            keyboardType="numeric"
+            maxLength={4}
+          />
+        </View>
+
+        {/* Submit Button */}
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={handleSubmit}
+          disabled={loading}
         >
-          <Picker.Item label="-- Choose Network --" value="" />
-          <Picker.Item label="MTN" value="01" />
-          <Picker.Item label="GLO" value="02" />
-          <Picker.Item label="Airtel" value="04" />
-          <Picker.Item label="9Mobile" value="03" />
-        </Picker>
+          {loading ? (
+            <ActivityIndicator color="#ffffff" />
+          ) : (
+            <Text style={styles.buttonText}>Buy Now</Text>
+          )}
+        </TouchableOpacity>
+        <Toast config={ToastUi} />
       </View>
 
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Amount</Text>
-        <TextInput
-          style={styles.input}
-          value={data.amount}
-          keyboardType="numeric"
-          onChangeText={(val) => handleChange("amount", val)}
-          placeholder="Enter Amount (min ₦50)"
-        />
-      </View>
-
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Phone Number</Text>
-        <TextInput
-          style={styles.input}
-          value={data.number}
-          keyboardType="phone-pad"
-          maxLength={11}
-          onChangeText={(val) => handleChange("number", val)}
-          placeholder="e.g. 09154358139"
-        />
-      </View>
-
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>PIN</Text>
-        <TextInput
-          style={styles.input}
-          value={data.pin}
-          onChangeText={(val) => handleChange("pin", val)}
-          secureTextEntry
-          maxLength={4}
-          keyboardType="number-pad"
-          placeholder="Enter your PIN"
-        />
-      </View>
-
-      <TouchableOpacity
-        onPress={handleFormSubmission}
-        disabled={loading}
-        style={styles.button}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Buy Now</Text>
-        )}
-      </TouchableOpacity>
-
-      {/* <AirtimeHelp data={data} /> */}
-    </View>
+      {/* <DataHelp data={form} /> */}
+    </ScrollView>
   );
 };
 
-export default BuyData;
-
+// Main component styles
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: '#F9FAFB',
     flex: 1,
+    backgroundColor: "#f8fafc",
+    paddingHorizontal: 16,
+    paddingTop: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f8fafc",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#64748b",
+  },
+  formContainer: {
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    padding: 20,
+    marginVertical: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
   title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#1D4ED8',
-    marginVertical: 20,
-    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#1d4ed8",
+    marginBottom: 30,
   },
-  formGroup: {
-    marginBottom: 15,
+  inputGroup: {
+    marginBottom: 20,
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 5,
-    color: '#374151',
+    fontWeight: "600",
+    color: "#374151",
+    marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    backgroundColor: '#fff',
+    borderColor: "#d1d5db",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    backgroundColor: "#ffffff",
+  },
+  readOnlyInput: {
+    backgroundColor: "#f3f4f6",
+    color: "#6b7280",
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 12,
+    backgroundColor: "#ffffff",
+  },
+  picker: {
+    height: 50,
   },
   button: {
-    backgroundColor: '#1D4ED8',
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: 'center',
+    backgroundColor: "#2563eb",
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: "center",
     marginTop: 10,
   },
+  buttonDisabled: {
+    backgroundColor: "#9ca3af",
+  },
   buttonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
+    color: "#ffffff",
+    fontSize: 18,
+    fontWeight: "600",
   },
 });
+
+export default BuyData;

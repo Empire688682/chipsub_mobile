@@ -17,6 +17,7 @@ export function AppProvider({ children }) {
   const [userTransactionData, setUserTransactionData] = useState({});
   const [allData, setAllData] = useState({});
   const mobileUserId = userData?.userId;
+  const [dataPlan, setDataPlan] = useState([]);
 
   const getLocalStorageUser = async () => {
     try {
@@ -103,6 +104,21 @@ export function AppProvider({ children }) {
     getLocalStorageUser();
   }, []);
 
+  // On mount, fetch available data plans from backend API
+  useEffect(() => {
+    const fetchDataPlan = async () => {
+      try {
+        const res = await axios.get(apiUrl + "api/data-plan");
+        if (res.data.success) {
+          setDataPlan(res.data.data);
+        }
+      } catch (error) {
+        console.log("Error:", error);
+      }
+    };
+    fetchDataPlan();
+  }, []);
+
 
   return (
     <AppContext.Provider value={{
@@ -122,7 +138,8 @@ export function AppProvider({ children }) {
       logout,
       fetchUserTransactionData,
       userTransactionData,
-      allData
+      allData,
+      dataPlan
     }}>
       {children}
     </AppContext.Provider>
